@@ -6,20 +6,6 @@ networks:
   back:
     driver: bridge
 
-volumes:
-  app:
-    driver: local
-    driver_opts:
-      type: none
-      device: $PWD/${APP_SRC}
-      o: bind
-  mysql:
-    driver: local
-    driver_opts:
-      type: none
-      device: $PWD/${MYSQL_DATA_SRC}
-      o: bind
-
 services:
   # ===== axelitus/laramesh-mysql =====
   mysql:
@@ -40,7 +26,7 @@ services:
     ports:
       - 33060:3306
     volumes:
-      - mysql:${MYSQL_DATA_PATH:-/data}
+      - $PWD/${MYSQL_DATA_SRC}:${MYSQL_DATA_PATH:-/data}
     networks:
       - back
   # ===== axelitus/laramesh-nginx =====
@@ -62,7 +48,7 @@ services:
     ports:
       - 8000:80
     volumes:
-      - app:${APP_PATH:-/app}
+      - $PWD/${APP_SRC}:${APP_PATH:-/app}
     networks:
       - front
   # ===== axelitus/laramesh-php =====
@@ -83,7 +69,7 @@ services:
     ports:
       - 9000:9000
     volumes:
-      - app:${APP_PATH:-/app}
+      - $PWD/${APP_SRC}:${APP_PATH:-/app}
     networks:
       - back
       - front
