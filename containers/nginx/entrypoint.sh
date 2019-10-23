@@ -34,7 +34,7 @@ change_owner_id() {
 }
 
 render_templates() {
-    local substitute_vars='$APP_CONTAINER_PATH:$NGINX_ROOT_SUBPATH'
+    local substitute_vars='$APP_CONTAINER_PATH:$APP_ROOT_SUBPATH'
 
     envsubst "$substitute_vars" < /etc/nginx/templates/default.template > /etc/nginx/sites-available/default
 }
