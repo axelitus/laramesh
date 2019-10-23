@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 LABEL maintainer="Axel Pardemann <axel.pardemann@norse.blue>"
 
-ARG APP_PATH
+ARG APP_CONTAINER_PATH
 
 RUN set -x \
     && export DEBIAN_FRONTEND=noninteractive \
@@ -42,7 +42,7 @@ RUN chmod +x /entrypoint.sh
 
 EXPOSE 9000
 STOPSIGNAL SIGQUIT
-WORKDIR ${APP_PATH}
+WORKDIR ${APP_CONTAINER_PATH}
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["php-fpm7.3"]

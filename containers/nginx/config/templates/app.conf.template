@@ -2,7 +2,7 @@ server {
     listen 80 default_server;
     listen [::]:80 default_server;
     server_name _;
-    root ${APP_PATH}${NGINX_ROOT_SUBPATH};
+    root ${APP_CONTAINER_PATH}${NGINX_ROOT_SUBPATH};
 
     index index.php index.html index.htm index.nginx-debian.html;
 

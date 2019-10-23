@@ -1,7 +1,7 @@
 FROM ubuntu:18.04
 LABEL maintainer="Axel Pardemann <axel.pardemann@norse.blue>"
 
-ARG MYSQL_DATA_PATH
+ARG MYSQL_CONTAINER_DATA_PATH
 
 RUN set -x \
     && export DEBIAN_FRONTEND=noninteractive \
@@ -29,9 +29,9 @@ RUN set -x \
         mysql-client \
         mysql-server \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -rf ${MYSQL_DATA_PATH} \
-    && mkdir -p ${MYSQL_DATA_PATH} /var/run/mysqld \
-    && chown -R mysql:mysql ${MYSQL_DATA_PATH} /var/run/mysqld \
+    && rm -rf ${MYSQL_CONTAINER_DATA_PATH} \
+    && mkdir -p ${MYSQL_CONTAINER_DATA_PATH} /var/run/mysqld \
+    && chown -R mysql:mysql ${MYSQL_CONTAINER_DATA_PATH} /var/run/mysqld \
     && chmod 777 /var/run/mysqld \
     && ln -fs /usr/share/mysql-8.0 /usr/share/mysql \
     && ln -fs errmsg-utf8.txt /usr/share/mysql-8.0/errmsg.sys
@@ -43,7 +43,7 @@ RUN chmod +x /entrypoint.sh
 
 EXPOSE 3306
 STOPSIGNAL SIGTERM
-WORKDIR ${MYSQL_DATA_PATH}
+WORKDIR ${MYSQL_CONTAINER_DATA_PATH}
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["mysqld"]

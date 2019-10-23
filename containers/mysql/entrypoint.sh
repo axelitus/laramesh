@@ -14,7 +14,7 @@ change_owner_id() {
 
     # Here we check if GID and UID are already defined properly or not
     # i.e Do we have a volume mounted and with a different uid/gid ?
-    if [[ -z "$(ls -n $MYSQL_DATA_PATH | grep $owner_uid_default)" ]]; then
+    if [[ -z "$(ls -n $MYSQL_CONTAINER_DATA_PATH | grep $owner_uid_default)" ]]; then
         : ${APP_OWNER_UID:=$(id -u mysql)}
         : ${APP_OWNER_GID:=$(id -g mysql)}
 
@@ -25,7 +25,7 @@ change_owner_id() {
             echo "Changing data owner UID and GID..."
             usermod  -u $APP_OWNER_UID mysql
             groupmod -g $APP_OWNER_GID mysql
-            chown -R mysql: $MYSQL_DATA_PATH /var/run/mysqld /var/log/mysql
+            chown -R mysql: $MYSQL_CONTAINER_DATA_PATH /var/run/mysqld /var/log/mysql
             echo "Data owner UID and GID changed to $APP_OWNER_UID and $APP_OWNER_GID."
         fi
     else
@@ -35,7 +35,7 @@ change_owner_id() {
 
 initialize_mysql() {
     local create_schema=
-    local mysql_files=$(ls -A $MYSQL_DATA_PATH)
+    local mysql_files=$(ls -A $MYSQL_CONTAINER_DATA_PATH)
 
     if [[ ! -z "$MYSQL_CREATE_SCHEMA" ]]; then
         read -r -d '' create_schema <<-EOSQL
@@ -75,7 +75,7 @@ EOSQL
 }
 
 main() {
-    echo "Data path: $MYSQL_DATA_PATH"
+    echo "Data path: $MYSQL_CONTAINER_DATA_PATH"
 
     change_owner_id
     initialize_mysql

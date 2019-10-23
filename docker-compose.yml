@@ -9,67 +9,67 @@ networks:
 services:
   # ===== axelitus/laramesh-mysql =====
   mysql:
-    container_name: ${APP_NAME:-app}_mysql
+    container_name: ${APP_ID:-app}_mysql
     build:
       context: ./containers/mysql
       dockerfile: Dockerfile
       args:
-        MYSQL_DATA_PATH: ${MYSQL_DATA_PATH:-/data}
+        MYSQL_CONTAINER_DATA_PATH: ${MYSQL_CONTAINER_DATA_PATH:-/data}
     image: axelitus/laramesh-mysql
     environment:
       APP_OWNER_GID: ${APP_OWNER_GID:-1000}
       APP_OWNER_UID: ${APP_OWNER_UID:-1000}
       MYSQL_CREATE_SCHEMA: ${MYSQL_CREATE_SCHEMA:-}
-      MYSQL_DATA_PATH: ${MYSQL_DATA_PATH:-/data}
+      MYSQL_CONTAINER_DATA_PATH: ${MYSQL_CONTAINER_DATA_PATH:-/data}
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
       MYSQL_ROOT_USER: ${MYSQL_ROOT_USER:-laramesh}
     ports:
       - 33060:3306
     volumes:
-      - ${MYSQL_DATA_SRC:-./data/mysql}:${MYSQL_DATA_PATH:-/data}
+      - ${MYSQL_DATA_SRC:-./data/mysql}:${MYSQL_CONTAINER_DATA_PATH:-/data}
     networks:
       - back
   # ===== axelitus/laramesh-nginx =====
   nginx:
-    container_name: ${APP_NAME:-app}_nginx
+    container_name: ${APP_ID:-app}_nginx
     build:
       context: ./containers/nginx
       dockerfile: Dockerfile
       args:
-        APP_PATH: ${APP_PATH:-app}
+        APP_CONTAINER_PATH: ${APP_CONTAINER_PATH:-app}
     image: axelitus/laramesh-nginx
     depends_on:
       - php
     environment:
       APP_OWNER_GID: ${APP_OWNER_GID:-1000}
       APP_OWNER_UID: ${APP_OWNER_UID:-1000}
-      APP_PATH: ${APP_PATH:-/app}
+      APP_CONTAINER_PATH: ${APP_CONTAINER_PATH:-/app}
       NGINX_ROOT_SUBPATH: ${NGINX_ROOT_SUBPATH:-/public}
     ports:
       - 8000:80
     volumes:
-      - ${APP_SRC:-./app}:${APP_PATH:-/app}
+      - ${APP_SRC:-./app}:${APP_CONTAINER_PATH:-/app}
     networks:
       - front
   # ===== axelitus/laramesh-php =====
   php:
-    container_name: ${APP_NAME:-app}_php
+    container_name: ${APP_ID:-app}_php
     build:
       context: ./containers/php
       dockerfile: Dockerfile
       args:
-        APP_PATH: ${APP_PATH:-/app}
+        APP_CONTAINER_PATH: ${APP_CONTAINER_PATH:-/app}
     image: axelitus/laramesh-php
     depends_on:
       - mysql
     environment:
       APP_OWNER_GID: ${APP_OWNER_GID:-1000}
       APP_OWNER_UID: ${APP_OWNER_UID:-1000}
-      APP_PATH: ${APP_PATH:-/app}
+      APP_CONTAINER_PATH: ${APP_CONTAINER_PATH:-/app}
     ports:
       - 9000:9000
     volumes:
-      - ${APP_SRC:-./app}:${APP_PATH:-/app}
+      - ${APP_SRC:-./app}:${APP_CONTAINER_PATH:-/app}
     networks:
       - back
       - front

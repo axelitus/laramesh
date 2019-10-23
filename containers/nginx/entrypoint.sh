@@ -14,7 +14,7 @@ change_owner_id() {
 
     # Here we check if GID and UID are already defined properly or not
     # i.e Do we have a volume mounted and with a different uid/gid ?
-    if [[ -z "$(ls -n $APP_PATH | grep $owner_uid_default)" ]]; then
+    if [[ -z "$(ls -n $APP_CONTAINER_PATH | grep $owner_uid_default)" ]]; then
         : ${APP_OWNER_UID:=$(id -u www-data)}
         : ${APP_OWNER_GID:=$(id -g www-data)}
 
@@ -25,7 +25,7 @@ change_owner_id() {
             echo "Changing app owner UID and GID..."
             usermod  -u $APP_OWNER_UID www-data
             groupmod -g $APP_OWNER_GID www-data
-            chown -R www-data: $APP_PATH
+            chown -R www-data: $APP_CONTAINER_PATH
             echo "App owner UID and GID changed to $APP_OWNER_UID and $APP_OWNER_GID."
         fi
     else
@@ -34,13 +34,13 @@ change_owner_id() {
 }
 
 render_templates() {
-    local substitute_vars='$APP_PATH:$NGINX_ROOT_SUBPATH'
+    local substitute_vars='$APP_CONTAINER_PATH:$NGINX_ROOT_SUBPATH'
 
     envsubst "$substitute_vars" < /etc/nginx/templates/default.template > /etc/nginx/sites-available/default
 }
 
 main() {
-    echo "Application path: $APP_PATH"
+    echo "Application path: $APP_CONTAINER_PATH"
 
     change_owner_id
     render_templates
