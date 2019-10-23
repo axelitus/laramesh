@@ -24,7 +24,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
       MYSQL_ROOT_USER: ${MYSQL_ROOT_USER:-laramesh}
     ports:
-      - 33060:3306
+      - ${HOST_PORT_BIND_MYSQL:-33060}:3306
     volumes:
       - ${MYSQL_DATA_SRC:-./data/mysql}:${MYSQL_CONTAINER_DATA_PATH:-/data}
     networks:
@@ -47,7 +47,7 @@ services:
       APP_CONTAINER_PATH: ${APP_CONTAINER_PATH:-/app}
       APP_ROOT_SUBPATH: ${APP_ROOT_SUBPATH:-/public}
     ports:
-      - 8000:80
+      - ${HOST_PORT_BIND_NGINX:-8000}:80
     volumes:
       - ${APP_SRC:-./app}:${APP_CONTAINER_PATH:-/app}
     networks:
@@ -69,7 +69,7 @@ services:
       APP_OWNER_UID: ${APP_OWNER_UID:-1000}
       APP_CONTAINER_PATH: ${APP_CONTAINER_PATH:-/app}
     ports:
-      - 9000:9000
+      - ${HOST_PORT_BIND_PHP_FPM:-9000}:9000
     volumes:
       - ${APP_SRC:-./app}:${APP_CONTAINER_PATH:-/app}
     networks:
