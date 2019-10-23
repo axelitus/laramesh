@@ -1,0 +1,11 @@
+{
+    "folders":
+    [
+        {
+            "path": "."
+        }
+    ],
+    "syntax_override": {
+        "\\.conf\\.template$": ["nginx", "Syntaxes", "nginx"]
+    }
+}

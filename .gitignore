@@ -1,0 +1,8 @@
+# Folders
+/.idea
+/.vscode
+/data/*/*
+!/data/*/.gitkeep
+
+# Files
+*.sublime-workspace
