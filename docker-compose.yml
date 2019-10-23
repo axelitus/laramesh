@@ -7,7 +7,7 @@ networks:
     driver: bridge
 
 services:
-  # ===== axelitus/laramesh-mysql =====
+  # ===== begin: mysql =====
   mysql:
     container_name: ${APP_ID:-app}_mysql
     build:
@@ -15,7 +15,7 @@ services:
       dockerfile: Dockerfile
       args:
         MYSQL_CONTAINER_DATA_PATH: ${MYSQL_CONTAINER_DATA_PATH:-/data}
-    image: axelitus/laramesh-mysql
+    image: ${IMAGE_NAME_PREFIX:-axelitus/laramesh}-mysql
     environment:
       APP_OWNER_GID: ${APP_OWNER_GID:-1000}
       APP_OWNER_UID: ${APP_OWNER_UID:-1000}
@@ -29,7 +29,8 @@ services:
       - ${MYSQL_DATA_SRC:-./data/mysql}:${MYSQL_CONTAINER_DATA_PATH:-/data}
     networks:
       - back
-  # ===== axelitus/laramesh-nginx =====
+  # ===== end: mysql =====
+  # ===== begin: nginx =====
   nginx:
     container_name: ${APP_ID:-app}_nginx
     build:
@@ -37,7 +38,7 @@ services:
       dockerfile: Dockerfile
       args:
         APP_CONTAINER_PATH: ${APP_CONTAINER_PATH:-app}
-    image: axelitus/laramesh-nginx
+    image: ${IMAGE_NAME_PREFIX:-axelitus/laramesh}-nginx
     depends_on:
       - php
     environment:
@@ -51,7 +52,8 @@ services:
       - ${APP_SRC:-./app}:${APP_CONTAINER_PATH:-/app}
     networks:
       - front
-  # ===== axelitus/laramesh-php =====
+  # ===== end: nginx =====
+  # ===== begin: php =====
   php:
     container_name: ${APP_ID:-app}_php
     build:
@@ -59,7 +61,7 @@ services:
       dockerfile: Dockerfile
       args:
         APP_CONTAINER_PATH: ${APP_CONTAINER_PATH:-/app}
-    image: axelitus/laramesh-php
+    image: ${IMAGE_NAME_PREFIX:-axelitus/laramesh}-php
     depends_on:
       - mysql
     environment:
@@ -73,3 +75,4 @@ services:
     networks:
       - back
       - front
+  # ===== end: php =====
