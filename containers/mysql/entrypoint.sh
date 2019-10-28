@@ -4,28 +4,32 @@
 # check to see if this file is being run or sourced from another script
 is_sourced() {
     # https://unix.stackexchange.com/a/215279
-    [ "${#FUNCNAME[@]}" -ge 2 ] \
-        && [ "${FUNCNAME[0]}" = '_is_sourced' ] \
-        && [ "${FUNCNAME[1]}" = 'source' ]
+    [[ "${#FUNCNAME[@]}" -ge 2 ]] \
+        && [[ "${FUNCNAME[0]}" = '_is_sourced' ]] \
+        && [[ "${FUNCNAME[1]}" = 'source' ]]
+}
+
+register_env_vars() {
+    : ${APP_OWNER_UID:=$(id -u mysql)} ; export APP_OWNER_UID
+    : ${APP_OWNER_GID:=$(id -g mysql)} ; export APP_OWNER_GID
+    : ${MYSQL_CONTAINER_DATA_PATH:=/data} ; export MYSQL_CONTAINER_DATA_PATH
+    : ${MYSQL_CREATE_SCHEMA:=} ; export MYSQL_CREATE_SCHEMA
+    : ${MYSQL_ROOT_USER:=laramesh} ; export MYSQL_ROOT_USER
+    : ${MYSQL_ROOT_PASSWORD:=secret} ; export MYSQL_ROOT_PASSWORD
 }
 
 change_owner_id() {
     local owner_uid_default=$(id -u mysql)
+    local owner_gid_default=$(id -u mysql)
 
     # Here we check if GID and UID are already defined properly or not
     # i.e Do we have a volume mounted and with a different uid/gid ?
-    if [[ -z "$(ls -n $MYSQL_CONTAINER_DATA_PATH | grep $owner_uid_default)" ]]; then
-        : ${APP_OWNER_UID:=$(id -u mysql)}
-        : ${APP_OWNER_GID:=$(id -g mysql)}
-
-        export APP_OWNER_UID
-        export APP_OWNER_GID
-
-        if [ "$APP_OWNER_UID" != "0" ] && [ "$APP_OWNER_UID" != "$(id -u mysql)" ]; then
+    if [[ "$APP_OWNER_UID" != "$owner_uid_default" || "$APP_OWNER_GID" != "$owner_gid_default" ]]; then
+        if [[ "$APP_OWNER_UID" != "0" && "$APP_OWNER_GID" != "0" ]]; then
             echo "Changing data owner UID and GID..."
-            usermod  -u $APP_OWNER_UID mysql
-            groupmod -g $APP_OWNER_GID mysql
-            chown -R mysql: $MYSQL_CONTAINER_DATA_PATH /var/run/mysqld /var/log/mysql
+            usermod  -u ${APP_OWNER_UID} mysql
+            groupmod -g ${APP_OWNER_GID} mysql
+            chown -R mysql: ${MYSQL_CONTAINER_DATA_PATH} /var/run/mysqld /var/log/mysql
             echo "Data owner UID and GID changed to $APP_OWNER_UID and $APP_OWNER_GID."
         fi
     else
@@ -35,7 +39,7 @@ change_owner_id() {
 
 initialize_mysql() {
     local create_schema=
-    local mysql_files=$(ls -A $MYSQL_CONTAINER_DATA_PATH)
+    local -a mysql_files=$(ls -A ${MYSQL_CONTAINER_DATA_PATH})
 
     if [[ ! -z "$MYSQL_CREATE_SCHEMA" ]]; then
         read -r -d '' create_schema <<-EOSQL
